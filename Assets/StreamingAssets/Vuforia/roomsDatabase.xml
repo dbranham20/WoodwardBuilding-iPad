@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="vuMark437" size="0.165100 0.212385" />
+    <ImageTarget name="vuMarkStdCtr" size="0.165100 0.212385" />
+    <ImageTarget name="vuMark404" size="0.165100 0.212725" />
+    <ImageTarget name="vuMark412" size="0.165100 0.212385" />
+    <ImageTarget name="vuMark334" size="0.165100 0.213066" />
+    <ImageTarget name="vuMark330A" size="0.165100 0.212725" />
+    <ImageTarget name="vuMark305A" size="0.165100 0.212385" />
+    <ImageTarget name="vuMark302" size="0.165100 0.212385" />
+    <ImageTarget name="vuMark237" size="0.165100 0.212385" />
+    <ImageTarget name="vuMark232" size="0.165100 0.212385" />
+  </Tracking>
+</QCARConfig>
