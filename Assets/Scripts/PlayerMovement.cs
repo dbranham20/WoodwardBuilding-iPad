@@ -18,6 +18,6 @@ public class PlayerMovement : MonoBehaviour {
 	void Update () 
     {
         ipadPlayer.transform.position = ARCamera.transform.position;
-        ARCamera.transform.rotation = ARCamera.transform.rotation;
+        ipadPlayer.transform.rotation = ARCamera.transform.rotation;
 	}
 }
