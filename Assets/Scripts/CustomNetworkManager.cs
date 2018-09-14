@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,16 +10,56 @@ public class CustomNetworkManager : NetworkManager {
     public Text connectionText;
     protected static short messageID = 777;
     public GameObject ARCamera, topCamera, map, camManager;
+    public GameObject playerObject;
+    string hostName;
+    string localIP;
 
     public class customMessage : MessageBase
     {
-        public string deviceType;
+        public string deviceType, purpose, ipAddress;
         public Vector3 devicePosition;
+        public Quaternion deviceRotation;
     }
 
     private void Start()
     {
         StartTopDown(); 
+    }
+
+    private void Update()
+    {
+        if (this.IsClientConnected()) {
+            if (playerObject == null){
+                
+                playerObject = GameObject.Instantiate(playerPrefab, new Vector3(5,1,-6), Quaternion.identity);
+            }else{
+                //if(VuforiaSimulationManager.isSimulationOn){
+                    //PlayerMovement.updatePlayerTransform(playerObject);
+                    updateLocation();
+                //}
+            }
+        }else{
+            print("didn't go in is client connected condition");
+        }
+    }
+
+     void updateLocation()
+    {
+        var msg = new customMessage();
+        msg.deviceType = "iPAD";
+        //if(VuforiaSimulationManager.isSimulationOn){
+        //    msg.purpose = "Simulation";
+        //    msg.ipAddress = localIP;
+        //}else{
+        //    msg.purpose = "Yet to decide";
+        //}
+        msg.ipAddress = localIP;
+        msg.purpose = "Simulation";
+        msg.devicePosition = playerObject.transform.position;
+        msg.deviceRotation = playerObject.transform.rotation;
+        print("Printing ip address sending in object: " + msg.ipAddress);
+        client.Send(messageID, msg);
+        print("Client sent message..");
     }
 
     private void OnGUI()
@@ -30,21 +71,28 @@ public class CustomNetworkManager : NetworkManager {
         if (GUI.Button(new Rect(10, 150, 200, 75), "Disconnect from Server"))
             StopClient();
         
-        if (GUI.Button(new Rect(10, 270, 200, 75), "Top Down"))
-            StartTopDown();
+        //if (GUI.Button(new Rect(10, 270, 200, 75), "Top Down"))
+        //    StartTopDown();
         
-        if (GUI.Button(new Rect(10, 390, 200, 75), "AR Camera"))
-            StartARCamera();
+        //if (GUI.Button(new Rect(10, 390, 200, 75), "AR Camera"))
+            //StartARCamera();
     }
 
     public override void OnClientConnect(NetworkConnection conn)
     {
+        
+        Debug.Log("connected to server. Connection address is "+conn.address.ToString());
         base.OnClientConnect(conn);
+
+        print("local ip of this machine is " + localIP);
         connectionText.text = "Connected";
         connectionText.color = Color.green;
         Debug.Log("Connected to server " + conn.address + " with ID " + conn.connectionId);
 
         MessageToServer("iPad");
+
+        this.hostName = System.Net.Dns.GetHostName();
+        this.localIP = "::ffff:"+System.Net.Dns.GetHostEntry(hostName).AddressList[0].ToString();
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -95,6 +143,7 @@ public class CustomNetworkManager : NetworkManager {
 
 
     }
+
 
    
 }

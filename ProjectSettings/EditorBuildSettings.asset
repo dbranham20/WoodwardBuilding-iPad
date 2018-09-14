@@ -41,3 +41,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/topDown.unity
     guid: 438e25cd858ba49e7b91b4fb5d55377c
+  - enabled: 0
+    path: Assets/Scenes/ARCameraExploration.unity
+    guid: 3cdbbeb7cd3ec4b9fac86c2804d000aa
+  m_configObjects: {}
