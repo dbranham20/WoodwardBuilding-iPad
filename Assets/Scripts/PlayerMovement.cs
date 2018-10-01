@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
     
@@ -8,8 +6,9 @@ public class PlayerMovement : MonoBehaviour {
     //GameObject ARCamera;
     public GameObject iPadcamera;
     public GameObject player;
-	// Use this for initialization
-	void Start () 
+    Vector3 playerOffset = Vector3.zero;
+    // Use this for initialization
+    void Start () 
     {
         //ipadPlayer = CustomNetworkManager
         //ipadPlayer = GameObject.FindGameObjectWithTag("Player"); // find gameobject with "player" tag
@@ -19,6 +18,17 @@ public class PlayerMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
     {
+        if (CustomNetworkManager.imageTartgetDetected == ""){
+            print("In Arbitrary location");
+
+        }else{
+            print("Target found. Offset is being calculated...");
+            //todo get image target name and take its transform origin and add to player's movement.
+            GameObject imageTarget = GameObject.FindWithTag("Room1");
+            playerOffset = new Vector3(6.5f,0.005f,-7.5f);
+        }
+
+
         if (CustomNetworkManager.singleton.IsClientConnected()){
             if (player == null)
             {
@@ -28,7 +38,14 @@ public class PlayerMovement : MonoBehaviour {
                 print("Updating player coordinates with ARCamera coordinates");
                 if (iPadcamera != null)
                 {
-                    player.transform.position = iPadcamera.transform.position;
+                    print("Camera coordinates:" +
+                          "\n x : " + iPadcamera.transform.position.x
+                          + "\n y : " + iPadcamera.transform.position.y
+                          + "\n z: " + iPadcamera.transform.position.z);
+
+                    print("Offset is " + playerOffset.x + ", " + playerOffset.y + ", " + playerOffset.z + "**********");
+
+                    player.transform.position = iPadcamera.transform.position + playerOffset;
                     player.transform.rotation = iPadcamera.transform.rotation;
                     print("In Player Movement class :\n player x: " + player.transform.position.x + "\nplayer y: " + player.transform.position.y + "\nplayer z: " + player.transform.position.z);
 

@@ -55,6 +55,8 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
         {
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
+            print("Trackable tag is " + mTrackableBehaviour.tag + "\n and Xtransform is "+mTrackableBehaviour.transform.position.x + "\nYtransform is " + mTrackableBehaviour.transform.position.y + "\nZtransform is " + mTrackableBehaviour.transform.position.z);
+            CustomNetworkManager.imageTartgetDetected = "mTrackableBehaviour.TrackableName";
             OnTrackingFound();
         }
         else if (previousStatus == TrackableBehaviour.Status.TRACKED &&
@@ -78,6 +80,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     protected virtual void OnTrackingFound()
     {
+
         var rendererComponents = GetComponentsInChildren<Renderer>(true);
         var colliderComponents = GetComponentsInChildren<Collider>(true);
         var canvasComponents = GetComponentsInChildren<Canvas>(true);
@@ -117,3 +120,5 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     #endregion // PROTECTED_METHODS
 }
+
+

@@ -8,8 +8,9 @@ using UnityEngine.UI;
 public class CustomNetworkManager : NetworkManager {
     
     public Text connectionText;
+    public static string imageTartgetDetected = "";
     protected static short messageID = 777;
-    public GameObject ARCamera, topCamera, map, camManager;
+    [SerializeField]public GameObject ARCamera, topCamera, map, camManager;
     public GameObject playerObject;
     string hostName;
     string localIP;
@@ -116,9 +117,10 @@ public class CustomNetworkManager : NetworkManager {
     {
         if(!topCamera.activeSelf) // turn on top down camera
             topCamera.SetActive(true);
-    
-        if(ARCamera.activeSelf) // turn off ar camera
-            ARCamera.SetActive(false);
+
+        if (ARCamera.activeSelf) // turn off ar camera
+            //ARCamera.SetActive(false);
+            ARCamera.GetComponent<Camera>().enabled = true;
 
         if (!map.activeSelf) // turn on map
             map.SetActive(true);
