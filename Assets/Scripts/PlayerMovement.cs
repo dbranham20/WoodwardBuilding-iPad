@@ -22,6 +22,8 @@ public class PlayerMovement : MonoBehaviour {
             print("In Arbitrary location");
 
         }else{
+            //Removing imagetarget detected for making it ready for next image target detection.
+            CustomNetworkManager.imageTartgetDetected = "";
             print("Target found. Offset is being calculated...");
             //todo get image target name and take its transform origin and add to player's movement.
             GameObject imageTarget = GameObject.FindWithTag("Room1");

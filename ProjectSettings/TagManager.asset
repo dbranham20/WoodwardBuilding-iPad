@@ -12,6 +12,7 @@ TagManager:
   - YLocation
   - ZLocation
   - Room1
+  - ImageTargetArbitrary
   layers:
   - Default
   - TransparentFX
