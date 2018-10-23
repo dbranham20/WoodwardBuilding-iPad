@@ -68,6 +68,31 @@ public class VectorMath : MonoBehaviour {
     private void GetServerPlayer()
     {
         //TODO: Use RealPlayer coordinates (in server world space) and make it relative to player.
+        RepositionServerObject();
+        RotateServerObjects();
+
+    }
+
+    private void RotateServerObjects()
+    {
+        //Rotating the player
+        //Code from Elias
+        var targetFlatForward = -ServerImageTarget.transform.up;
+        targetFlatForward.y = 0;
+        targetFlatForward.Normalize();
+        var targQuat = Quaternion.LookRotation(targetFlatForward, Vector3.up);
+
+        var cameraFlatForward = thirdRealPlayer.transform.forward;
+        cameraFlatForward.y = 0;
+        cameraFlatForward.Normalize();
+        var camQuat = Quaternion.LookRotation(cameraFlatForward, Vector3.up);
+
+        var flatAngle = Quaternion.Inverse(targQuat) * camQuat;
+        thirdVirtualPlayer.transform.localRotation = flatAngle;
+    }
+
+    private void RepositionServerObject()
+    {
         //Code from Elias
         var m = Matrix4x4.TRS(ServerImageTarget.transform.position - thirdRealPlayer.transform.position, ServerImageTarget.transform.rotation, Vector3.one);
         m = m.inverse;
@@ -76,7 +101,6 @@ public class VectorMath : MonoBehaviour {
         var pos = MatrixUtils.ExtractTranslationFromMatrix(ref m);
         thirdVirtualPlayer.SetActive(true);
         thirdVirtualPlayer.transform.position = pos + PlayerImageTarget.transform.position;
-
     }
 
     private void RepositionThePlayer()
