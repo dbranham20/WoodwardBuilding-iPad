@@ -54,8 +54,13 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             newStatus == TrackableBehaviour.Status.TRACKED ||
             newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
         {
+            PlayerMovement.PlayerImageTarget = gameObject;
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
+            TrackerManager.Instance.GetTracker<ObjectTracker>().Stop();
             OnTrackingFound();
+            //NewMovementManager.lastImageTracked = mTrackableBehaviour.TrackableName;
+            PlayerMovement.vuforiaTargetDetected = true;
+            PlaySound();
         }
         else if (previousStatus == TrackableBehaviour.Status.TRACKED &&
                  newStatus == TrackableBehaviour.Status.NO_POSE)
@@ -70,6 +75,12 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             // Call OnTrackingLost() to hide the augmentations
             OnTrackingLost();
         }
+    }
+
+    private void PlaySound()
+    {
+        AudioSource targetFoundSound = gameObject.GetComponent<AudioSource>();
+        targetFoundSound.Play();
     }
 
     #endregion // PUBLIC_METHODS

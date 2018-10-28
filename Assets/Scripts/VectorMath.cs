@@ -8,7 +8,6 @@ public class VectorMath : MonoBehaviour {
 
     [SerializeField] GameObject ServerImageTarget;
     [SerializeField] GameObject PlayerImageTarget;
-    public Vector3 cameraPosition, playerPosition;
     public Camera mainCamera;
     public GameObject realPlayer, virtualPlayer, thirdRealPlayer, thirdVirtualPlayer;
     [SerializeField] bool vuforiaTargetDetected = false;

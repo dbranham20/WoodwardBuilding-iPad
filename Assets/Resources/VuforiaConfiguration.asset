@@ -65,5 +65,5 @@ MonoBehaviour:
   webcam:
     deviceNameSetInEditor: Logitech Camera
     flipHorizontally: 0
-    turnOffWebCam: 1
+    turnOffWebCam: 0
     renderTextureLayer: 30
