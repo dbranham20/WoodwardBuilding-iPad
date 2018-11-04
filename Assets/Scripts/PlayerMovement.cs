@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour {
 
     //These are simple checks to reduce some non required loops. Need to improve that
     public static bool vuforiaTargetDetected = false;
-    string lastImageTracked = "";
+    public static string lastImageTracked = "";
 
     //TODO: Seems like it compensates the initial rotation that image target introduces. Need more analysis.
     private readonly Quaternion xAxisRot = Quaternion.AngleAxis(90, Vector3.right);
