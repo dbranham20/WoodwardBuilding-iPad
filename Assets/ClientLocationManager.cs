@@ -8,7 +8,7 @@ public class ClientLocationManager : MonoBehaviour {
     // Next update in second
     Dictionary<int, GameObject> localPlayers = new Dictionary<int, GameObject>();
     [SerializeField] public GameObject ServerImageTarget;
-    private int nextUpdate = 1;
+    private float nextUpdate = 1;
     void Update()
     {
 
@@ -16,7 +16,7 @@ public class ClientLocationManager : MonoBehaviour {
         if (Time.time >= nextUpdate)
         {
             // Change the next update (current second+1)
-            nextUpdate = Mathf.FloorToInt(Time.time) + 1;
+            nextUpdate = Time.time + 0.5f;
             // Call your fonction
             UpdateEverySecond();
         }
@@ -35,7 +35,6 @@ public class ClientLocationManager : MonoBehaviour {
             {
                 if(player != null){
                     updatePlayerTransform(player, id);
-                    print("ID is incremented to " + id);
                     id++;
                 }
 
@@ -54,6 +53,7 @@ public class ClientLocationManager : MonoBehaviour {
             GameObject localPlayerObject = localPlayers[id];
             localPlayerObject.SetActive(true);
             RepositionServerObject(player, localPlayerObject);
+
         }else{
             print("Inside ELSE");
             GameObject localPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -87,7 +87,7 @@ public class ClientLocationManager : MonoBehaviour {
     private void RepositionServerObject(GameObject playerFromServer, GameObject localPlayer)
     {
         //Code from Elias
-        var m = Matrix4x4.TRS(ServerImageTarget.transform.position - playerFromServer.transform.position, ServerImageTarget.transform.rotation, Vector3.one);
+        var m = Matrix4x4.TRS(playerFromServer.transform.position - ServerImageTarget.transform.position , ServerImageTarget.transform.rotation, Vector3.one);
         m = m.inverse;
 
         //Positioning the player

@@ -115,8 +115,6 @@ public class CustomNetworkManager : NetworkManager {
         //TODO: Register event handler to server to client communication
 
         this.client.RegisterHandler(778, OnReceivedMessage);
-
-
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -148,8 +146,8 @@ public class CustomNetworkManager : NetworkManager {
         if (!map.activeSelf) // turn on map
             map.SetActive(true);
 
-        if (camManager.activeSelf) // turn off ar camera manager
-            camManager.SetActive(false);
+        //if (camManager.activeSelf) // turn off ar camera manager
+            //camManager.SetActive(false);
     }
 
     void StartARCamera()
