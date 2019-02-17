@@ -1140,7 +1140,7 @@ Prefab:
     - target: {fileID: 114971693538313544, guid: 39a6998983d6c4004b93c93f23e21d0e,
         type: 2}
       propertyPath: m_NetworkAddress
-      value: 192.168.137.1
+      value: 10.18.203.127
       objectReference: {fileID: 0}
     - target: {fileID: 114971693538313544, guid: 39a6998983d6c4004b93c93f23e21d0e,
         type: 2}
@@ -1152,6 +1152,16 @@ Prefab:
       propertyPath: camManager
       value: 
       objectReference: {fileID: 287561530}
+    - target: {fileID: 114971693538313544, guid: 39a6998983d6c4004b93c93f23e21d0e,
+        type: 2}
+      propertyPath: m_ServerBindToIP
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114971693538313544, guid: 39a6998983d6c4004b93c93f23e21d0e,
+        type: 2}
+      propertyPath: m_NetworkPort
+      value: 1536
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 39a6998983d6c4004b93c93f23e21d0e, type: 2}
   m_IsPrefabAsset: 0

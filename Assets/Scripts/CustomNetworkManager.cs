@@ -168,21 +168,29 @@ public class CustomNetworkManager : NetworkManager {
     }
 
     //TODO: make this function more dynamic and a starting point to switch to multiple type of operations that the device woudl perform on server's command.
-    protected void OnReceivedMessage(NetworkMessage netMsg){
+    protected void OnReceivedMessage(NetworkMessage netMsg)
+    {
+        //TODO: Disable self player renderer. Hide self player oject which is manupulated locally. Show the contents being received from server.
+        //HideLocalPlayer();
+
         var msg = netMsg.ReadMessage<ClientLocations>();
         print("Message recieved from server");
 
-        if(msg.devicePosition1 != Vector3.zero && msg.deviceRotation1 != Quaternion.identity){
+        if (msg.devicePosition1 != Vector3.zero && msg.deviceRotation1 != Quaternion.identity)
+        {
             GameObject localPlayer;
-            if (clientsRawData[0] == null){
-                localPlayer = new GameObject();
+            if (clientsRawData[0] == null)
+            {
+                localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
                 clientsRawData[0] = localPlayer;
-            }else{
+            }
+            else
+            {
                 localPlayer = clientsRawData[0];
             }
-             
-            localPlayer.transform.position = msg.devicePosition1;
-            localPlayer.transform.rotation = msg.deviceRotation1;
+            localPlayer.transform.localPosition = msg.devicePosition1;
+            localPlayer.transform.localRotation = msg.deviceRotation1;
+
             clientsRawData[0] = localPlayer;
         }
         if (msg.devicePosition2 != Vector3.zero && msg.deviceRotation2 != Quaternion.identity)
@@ -191,7 +199,7 @@ public class CustomNetworkManager : NetworkManager {
             GameObject localPlayer;
             if (clientsRawData[1] == null)
             {
-                localPlayer = new GameObject();
+                localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
                 clientsRawData[1] = localPlayer;
             }
             else
@@ -200,13 +208,25 @@ public class CustomNetworkManager : NetworkManager {
             }
             localPlayer.transform.position = msg.devicePosition2;
             localPlayer.transform.rotation = msg.deviceRotation2;
+            //localPlayer.transform.SetParent(WorldMap.transform, true);
             clientsRawData[1] = localPlayer;
         }
         if (msg.devicePosition3 != Vector3.zero && msg.deviceRotation3 != Quaternion.identity)
         {
-            GameObject localPlayer = clientsRawData[2];
+            print("Second player is added");
+            GameObject localPlayer;
+            if (clientsRawData[2] == null)
+            {
+                localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
+                clientsRawData[2] = localPlayer;
+            }
+            else
+            {
+                localPlayer = clientsRawData[2];
+            }
             localPlayer.transform.position = msg.devicePosition3;
             localPlayer.transform.rotation = msg.deviceRotation3;
+            //localPlayer.transform.SetParent(WorldMap.transform, true);
             clientsRawData[2] = localPlayer;
         }
         if (msg.devicePosition4 != Vector3.zero && msg.deviceRotation4 != Quaternion.identity)
@@ -248,5 +268,10 @@ public class CustomNetworkManager : NetworkManager {
         //clientsRawData = msg.clients;
     }
 
-   
+    private void HideLocalPlayer()
+    {
+        if (playerObject.GetComponent<Renderer>().enabled == true){
+            playerObject.GetComponent<Renderer>().enabled = false;
+        }
+    }
 }

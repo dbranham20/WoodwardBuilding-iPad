@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Floor1
+  m_Shader: {fileID: 4800000, guid: c1fccc4936d284666ad92c815d2b7803, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _FlickerTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 1, y: 1}
+    m_Floats:
+    - _Alpha: 0.847
+    - _Brightness: 4.19
+    - _FlickerSpeed: 1
+    - _Fold: 3
+    - _GlitchIntensity: 0
+    - _GlitchSpeed: 1
+    - _GlowSpeed: 0.6
+    - _GlowTiling: 0.01
+    - _RimPower: 5.07
+    - _ScanSpeed: 0
+    - _ScanTiling: 6.22
+    m_Colors:
+    - _Direction: {r: 0, g: 0, b: 1, a: 0}
+    - _MainColor: {r: 0.31132078, g: 0.101768576, b: 0.039649345, a: 1}
+    - _RimColor: {r: 0.764151, g: 0.1549929, b: 0.1549929, a: 1}
