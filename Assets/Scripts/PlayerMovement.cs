@@ -1,5 +1,10 @@
 ﻿using UnityEngine;
 
+
+/// <summary>
+/// A class dedicated to update the player's location based on AR Camera and update it according to the image target that is found.
+/// This location will be sent to the server.
+/// </summary>
 public class PlayerMovement : MonoBehaviour {
     //ServerImage Target is place which is universal. Each client and server will have server image location targets. 
     //TODO: The 'image' word is misleading. Will update the name in next update. Should be something like ServerTargetLocation
@@ -70,11 +75,14 @@ public class PlayerMovement : MonoBehaviour {
         //TODO: GetThe Player Image Target which was last recognized in imageTargetInPlayerWorld
         //Code from Elias
         print("Player Image Target transform : " + PlayerImageTarget);
-        var m = Matrix4x4.TRS(PlayerCamera.transform.position - PlayerImageTarget.transform.position, PlayerImageTarget.transform.rotation * xAxisRot, Vector3.one);
+        var m = Matrix4x4.TRS(PlayerCamera.transform.position - PlayerImageTarget.transform.position,
+                              PlayerImageTarget.transform.rotation * xAxisRot, 
+                              Vector3.one);
         m = m.inverse;
 
         //Positioning the player
         var pos = MatrixUtils.ExtractTranslationFromMatrix(ref m);
+        pos.y = -pos.y;
         //Setting the virtual player as a child of Image Target (for server)
         virtualPlayer.transform.SetParent(ServerImageTarget.transform, false);
         //Assigning local position to virtual player with rewspect to Image Target

@@ -15,6 +15,7 @@ TagManager:
   - ImageTargetArbitrary
   - Places
   - Astronaut
+  - Waypoints
   layers:
   - Default
   - TransparentFX

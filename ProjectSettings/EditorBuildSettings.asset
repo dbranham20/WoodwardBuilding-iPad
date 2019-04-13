@@ -50,7 +50,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/topDown v3.unity
     guid: c160acba4266b438ca0d5fe424457ff3
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/VerticalTesting.unity
     guid: bd8ae64c59e1c4029a396f417bc83288
+  - enabled: 0
+    path: Assets/Scenes/ARViewTrial.unity
+    guid: 75de8312917c848918a15e137a46e905
+  - enabled: 1
+    path: Assets/Scenes/FloorNavigation.unity
+    guid: dabe90744a778414a844c6589f0deac5
   m_configObjects: {}

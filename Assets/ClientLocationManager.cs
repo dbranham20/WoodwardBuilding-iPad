@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// A dedicated class to manage and place the gameobjects of the connected players
+/// This class traverses through the list of connected players and update its game objects.
+/// </summary>
 public class ClientLocationManager : MonoBehaviour {
 
     // Next update in second

@@ -15,12 +15,14 @@ public class CustomNetworkManager : NetworkManager {
     string hostName;
     string localIP;
     static public GameObject[] clientsRawData = new GameObject[8];
+    float[] floatArray = new float[10000];
 
     public class customMessage : MessageBase
     {
         public string deviceType, purpose, ipAddress;
         public Vector3 devicePosition;
         public Quaternion deviceRotation;
+        public float[] hugeArrayOfFloats;
     }
 
     public class ClientLocations : MessageBase
@@ -46,7 +48,18 @@ public class CustomNetworkManager : NetworkManager {
 
     private void Start()
     {
-        StartTopDown(); 
+        StartTopDown();
+
+        CreateAndSetFloatArrayToSend();
+    }
+
+    private void CreateAndSetFloatArrayToSend()
+    {
+
+        for (int i = 0; i < 9999; i++)
+        {
+            floatArray[i] = i;
+        }
     }
 
     private void Update()
@@ -62,7 +75,7 @@ public class CustomNetworkManager : NetworkManager {
                 //}
             }
         }else{
-            print("didn't go in is client connected condition");
+           // print("didn't go in is client connected condition");
         }
     }
 
@@ -75,9 +88,21 @@ public class CustomNetworkManager : NetworkManager {
         msg.purpose = "Simulation";
         msg.devicePosition = playerObject.transform.position;
         msg.deviceRotation = playerObject.transform.rotation;
+        msg.hugeArrayOfFloats = floatArray;
         print("Printing ip address sending in object: " + msg.ipAddress);
-        client.Send(messageID, msg);
+        updateLocationToServer(msg);
         print("Client sent message..");
+    }
+
+    [SerializeField] float updateFrequency = 0.2f;
+    float nextUpdate = 0.0f;
+    private void updateLocationToServer(customMessage msg)
+    {
+        if(Time.time >= nextUpdate){
+            nextUpdate = Time.time + updateFrequency;
+            client.Send(messageID, msg);
+        }
+
     }
 
     private void OnGUI()
