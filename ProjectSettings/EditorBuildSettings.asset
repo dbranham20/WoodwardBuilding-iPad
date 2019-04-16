@@ -56,7 +56,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ARViewTrial.unity
     guid: 75de8312917c848918a15e137a46e905
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorNavigation.unity
     guid: dabe90744a778414a844c6589f0deac5
+  - enabled: 1
+    path: Assets/Scenes/SeperatingFloors.unity
+    guid: fc90a46ae02884275a46fa17c521a824
   m_configObjects: {}

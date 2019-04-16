@@ -6,15 +6,18 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class CustomNetworkManager : NetworkManager {
-    
+
+    const int MaxClients = 10;
     public Text connectionText;
+    public Text floorText;
     public static string imageTartgetDetected = "";
     protected static short messageID = 777;
     [SerializeField]public GameObject ARCamera, topCamera, map, camManager;
+    [SerializeField] public GameObject Building, FirstFloor, SecondFloor, ThirdFloor, FourthFloor;
     public GameObject playerObject;
     string hostName;
     string localIP;
-    static public GameObject[] clientsRawData = new GameObject[8];
+    static public GameObject[] clientsRawData = new GameObject[MaxClients];
     float[] floatArray = new float[10000];
 
     public class customMessage : MessageBase
@@ -23,6 +26,10 @@ public class CustomNetworkManager : NetworkManager {
         public Vector3 devicePosition;
         public Quaternion deviceRotation;
         public float[] hugeArrayOfFloats;
+    }
+
+    enum FloorLevel{
+        first, second, third, fourth, unknown
     }
 
     public class ClientLocations : MessageBase
@@ -43,6 +50,14 @@ public class CustomNetworkManager : NetworkManager {
         public Quaternion deviceRotation7;
         public Vector3 devicePosition8;
         public Quaternion deviceRotation8;
+
+    }
+
+    public class ClientCoordinates : MessageBase
+    {
+        public Vector3[] positions;
+        public Quaternion[] rotations;
+        public int numberOfClients;
 
     }
 
@@ -113,12 +128,7 @@ public class CustomNetworkManager : NetworkManager {
         
         if (GUI.Button(new Rect(10, 150, 200, 75), "Disconnect from Server"))
             StopClient();
-        
-        //if (GUI.Button(new Rect(10, 270, 200, 75), "Top Down"))
-        //    StartTopDown();
-        
-        //if (GUI.Button(new Rect(10, 390, 200, 75), "AR Camera"))
-            //StartARCamera();
+
     }
 
     public override void OnClientConnect(NetworkConnection conn)
@@ -140,6 +150,7 @@ public class CustomNetworkManager : NetworkManager {
         //TODO: Register event handler to server to client communication
 
         this.client.RegisterHandler(778, OnReceivedMessage);
+        this.client.RegisterHandler(800, OnReceivedCoordinates);
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -291,6 +302,115 @@ public class CustomNetworkManager : NetworkManager {
         }
 
         //clientsRawData = msg.clients;
+    }
+
+
+
+    protected void OnReceivedCoordinates(NetworkMessage netMsg)
+    {
+        print("Received location updates from server");
+        var msg = netMsg.ReadMessage<ClientCoordinates>();
+
+        //Scan through the client coordinate response one by one and check if there are any updates. If so update the list of clients on the client side.
+        for (int i = 0; i < MaxClients ; i ++){
+            Vector3 playerPosition = msg.positions[i];
+            Quaternion playerRotation = msg.rotations[i];
+
+            if (playerPosition != Vector3.zero && playerRotation != Quaternion.identity)
+            {
+                GameObject localPlayer;
+                if (clientsRawData[i] == null)
+                {
+                    localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
+                    clientsRawData[0] = localPlayer;
+                }
+                else
+                {
+                    localPlayer = clientsRawData[0];
+                }
+
+                //Determine the floor
+                FloorLevel floor = DetermineFloor(playerPosition);
+
+                //Select floor model as a parent
+                GameObject parent = Building;
+                parent = SelectParent(floor);
+
+                //Get position based on floor's location in the world
+                Vector3 localizedPosition = playerPosition - parent.transform.position;
+                localPlayer.transform.SetParent(parent.transform, true);
+                //Set the local players parent as the floor model
+                // Make transformation based on where the floor currently is
+                // assign the localposition as required
+                localPlayer.transform.localPosition = localizedPosition;
+                localPlayer.transform.localRotation = playerRotation;
+                clientsRawData[i] = localPlayer;
+            }
+        }
+    }
+
+    private GameObject SelectParent(FloorLevel floor)
+    {
+        GameObject parent;
+        switch (floor)
+        {
+            case FloorLevel.first:
+                {
+                    parent = FirstFloor;
+                    break;
+                }
+
+            case FloorLevel.second:
+                {
+                    parent = SecondFloor;
+                    break;
+                }
+
+            case FloorLevel.third:
+                {
+                    parent = ThirdFloor;
+                    break;
+                }
+
+            case FloorLevel.fourth:
+                {
+                    parent = FourthFloor;
+                    break;
+                }
+
+            case FloorLevel.unknown:
+                {
+                    parent = Building;
+                    break;
+                }
+
+            default:
+                {
+                    parent = Building;
+                    print("Going in default case...");
+                    break;
+                }
+        }
+
+        return parent;
+    }
+
+    private FloorLevel DetermineFloor(Vector3 playerPosition)
+    {
+        //TODO: Determine the floor based on y axis.
+        FloorLevel floor = FloorLevel.unknown;
+        // +2 ... -1 -> Fourth Floor
+        // -1... -4 -> Third Floor
+        // -4 ... -8 -> Second floor
+        // -8 ... -15 > First Floor
+        var yPosition = playerPosition.y;
+        if (yPosition > -1 && yPosition <= 4) { floor = FloorLevel.fourth; }
+        else if (yPosition > -4 && yPosition <= -1) { floor = FloorLevel.third; }
+        else if (yPosition > -8 && yPosition <= -4) { floor = FloorLevel.second; }
+        else if (yPosition > -15 && yPosition <= -8) { floor = FloorLevel.first; }
+        else { floor = FloorLevel.unknown; }
+        floorText.text = floor.ToString();
+        return floor;
     }
 
     private void HideLocalPlayer()
