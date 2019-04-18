@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NavigationViz : INodeNavigationInterface {
+public class NavigationViz {
 
 
     ArrayList allPaths = new ArrayList();
@@ -32,12 +32,16 @@ public class NavigationViz : INodeNavigationInterface {
                 Debug.Log("GameObject named " + node + "is not found.. Please check");
             }
             if(i == 0){
-                line = nodeObject.AddComponent<LineRenderer>();
+                line = nodeObject.GetComponent<LineRenderer>();
+                if(line == null){
+                    line = nodeObject.AddComponent<LineRenderer>();
+                }
                 // Set the width of the Line Renderer
                 line.startWidth = 1f;
                 line.endWidth = 1f;
                 // Set the number of vertex fo the Line Renderer
-                line.SetVertexCount(pathSelected.Count);
+                //line.SetVertexCount(pathSelected.Count);
+                line.positionCount = pathSelected.Count;
             }
             if(nodeObject == null){
                 Debug.Log(node + "is not found.");

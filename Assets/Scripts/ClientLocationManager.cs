@@ -31,11 +31,11 @@ public class ClientLocationManager : MonoBehaviour {
     void UpdateEverySecond()
     {
 
-        if (CustomNetworkManager.clientsRawData.Length > 0 && PlayerMovement.lastImageTracked != "")
+        if (CustomNetworkManager.ClientRawGameObjects.Length > 0 && PlayerMovement.lastImageTracked != "")
         {
             int id = 0;
             //One by one, calculate each clients location and update the gameobject
-            foreach (GameObject player in CustomNetworkManager.clientsRawData)
+            foreach (GameObject player in CustomNetworkManager.ClientRawGameObjects)
             {
                 if(player != null){
                     updatePlayerTransform(player, id);

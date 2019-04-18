@@ -1,0 +1,17 @@
+R1M1
+R1F1
+center0
+center1
+130
+138
+140
+135
+center2
+center3
+center4
+R1F2
+R1M2
+stair1
+elevator1
+1turn1
+1turn2

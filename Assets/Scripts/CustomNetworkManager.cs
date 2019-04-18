@@ -12,25 +12,24 @@ public class CustomNetworkManager : NetworkManager {
     public Text floorText;
     public static string imageTartgetDetected = "";
     protected static short messageID = 777;
-    [SerializeField]public GameObject ARCamera, topCamera, map, camManager;
+    [SerializeField]public GameObject ARCamera, map, camManager;
     [SerializeField] public GameObject Building, FirstFloor, SecondFloor, ThirdFloor, FourthFloor;
     public GameObject playerObject;
     string hostName;
     string localIP;
-    static public GameObject[] clientsRawData = new GameObject[MaxClients];
-    float[] floatArray = new float[10000];
+    static public GameObject[] ClientRawGameObjects = new GameObject[MaxClients];
 
     public class customMessage : MessageBase
     {
         public string deviceType, purpose, ipAddress;
         public Vector3 devicePosition;
         public Quaternion deviceRotation;
-        public float[] hugeArrayOfFloats;
+
     }
 
-    enum FloorLevel{
-        first, second, third, fourth, unknown
-    }
+    //enum FloorLevel{
+    //    first, second, third, fourth, unknown
+    //}
 
     public class ClientLocations : MessageBase
     {
@@ -61,58 +60,37 @@ public class CustomNetworkManager : NetworkManager {
 
     }
 
-    private void Start()
-    {
-        StartTopDown();
-
-        CreateAndSetFloatArrayToSend();
-    }
-
-    private void CreateAndSetFloatArrayToSend()
-    {
-
-        for (int i = 0; i < 9999; i++)
-        {
-            floatArray[i] = i;
-        }
-    }
 
     private void Update()
     {
+
+        //Update the location if the connected with server
         if (this.IsClientConnected()) {
             if (playerObject == null){
-                
                 playerObject = GameObject.Instantiate(playerPrefab, new Vector3(5,1,-6), Quaternion.identity);
             }else{
-                //if(VuforiaSimulationManager.isSimulationOn){
-                    //PlayerMovement.updatePlayerTransform(playerObject);
-                    updateLocation();
-                //}
+                CreateMessageAndSend();
             }
-        }else{
-           // print("didn't go in is client connected condition");
         }
     }
 
-     void updateLocation()
+    void CreateMessageAndSend()
     {
         var msg = new customMessage();
-        msg.deviceType = "iPAD";
 
+        msg.deviceType = "iPAD";
         msg.ipAddress = localIP;
         msg.purpose = "Simulation";
         msg.devicePosition = playerObject.transform.position;
         msg.deviceRotation = playerObject.transform.rotation;
-        msg.hugeArrayOfFloats = floatArray;
-        print("Printing ip address sending in object: " + msg.ipAddress);
-        updateLocationToServer(msg);
-        print("Client sent message..");
+        SendToServer(msg);
     }
 
     [SerializeField] float updateFrequency = 0.2f;
     float nextUpdate = 0.0f;
-    private void updateLocationToServer(customMessage msg)
+    private void SendToServer(customMessage msg)
     {
+        //TODO:- Update frequency is set. Modify this function properly
         if(Time.time >= nextUpdate){
             nextUpdate = Time.time + updateFrequency;
             client.Send(messageID, msg);
@@ -120,6 +98,7 @@ public class CustomNetworkManager : NetworkManager {
 
     }
 
+    //TODO: See if this function can go out of network manager
     private void OnGUI()
     {
         //Buttons
@@ -133,10 +112,9 @@ public class CustomNetworkManager : NetworkManager {
 
     public override void OnClientConnect(NetworkConnection conn)
     {
-        
+        //UI Task
         Debug.Log("connected to server. Connection address is "+conn.address.ToString());
         base.OnClientConnect(conn);
-
         print("local ip of this machine is " + localIP);
         connectionText.text = "Connected";
         connectionText.color = Color.green;
@@ -149,10 +127,12 @@ public class CustomNetworkManager : NetworkManager {
 
         //TODO: Register event handler to server to client communication
 
+        //TODO: Remove 778 handler once 800 is tested well.
         this.client.RegisterHandler(778, OnReceivedMessage);
         this.client.RegisterHandler(800, OnReceivedCoordinates);
     }
 
+    //Function call back when this client disconnects the server
     public override void OnClientDisconnect(NetworkConnection conn)
     {
         base.OnClientDisconnect(conn);
@@ -161,46 +141,13 @@ public class CustomNetworkManager : NetworkManager {
         Debug.Log("Disconnected from server " + conn.address);
     }
 
+    //TODO: Not so important function. Can remove this implementation altogether
     void MessageToServer(string deviceConnecting)
     {
         var sendMSG = new customMessage();
         sendMSG.deviceType = deviceConnecting; // adding values to message class
         sendMSG.devicePosition = new Vector3(16.5f, 0.5f, 59);
-
         client.Send(messageID, sendMSG); // send message
-    }
-
-    void StartTopDown()
-    {
-        if(!topCamera.activeSelf) // turn on top down camera
-            topCamera.SetActive(true);
-
-        if (ARCamera.activeSelf) // turn off ar camera
-            //ARCamera.SetActive(false);
-            ARCamera.GetComponent<Camera>().enabled = true;
-
-        if (!map.activeSelf) // turn on map
-            map.SetActive(true);
-
-        //if (camManager.activeSelf) // turn off ar camera manager
-            //camManager.SetActive(false);
-    }
-
-    void StartARCamera()
-    {
-        if (topCamera.activeSelf) // turn off top down camera
-            topCamera.SetActive(false);
-        
-        if (!ARCamera.activeSelf) // turn on ar camera
-            ARCamera.SetActive(true);
-        
-        if (map.activeSelf) // turn off map
-            map.SetActive(false);
-
-        if (!camManager.activeSelf) // turn on camera manager
-            camManager.SetActive(true);
-
-
     }
 
     //TODO: make this function more dynamic and a starting point to switch to multiple type of operations that the device woudl perform on server's command.
@@ -215,90 +162,90 @@ public class CustomNetworkManager : NetworkManager {
         if (msg.devicePosition1 != Vector3.zero && msg.deviceRotation1 != Quaternion.identity)
         {
             GameObject localPlayer;
-            if (clientsRawData[0] == null)
+            if (ClientRawGameObjects[0] == null)
             {
                 localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
-                clientsRawData[0] = localPlayer;
+                ClientRawGameObjects[0] = localPlayer;
             }
             else
             {
-                localPlayer = clientsRawData[0];
+                localPlayer = ClientRawGameObjects[0];
             }
             localPlayer.transform.localPosition = msg.devicePosition1;
             localPlayer.transform.localRotation = msg.deviceRotation1;
 
-            clientsRawData[0] = localPlayer;
+            ClientRawGameObjects[0] = localPlayer;
         }
         if (msg.devicePosition2 != Vector3.zero && msg.deviceRotation2 != Quaternion.identity)
         {
             print("Second player is added");
             GameObject localPlayer;
-            if (clientsRawData[1] == null)
+            if (ClientRawGameObjects[1] == null)
             {
                 localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
-                clientsRawData[1] = localPlayer;
+                ClientRawGameObjects[1] = localPlayer;
             }
             else
             {
-                localPlayer = clientsRawData[1];
+                localPlayer = ClientRawGameObjects[1];
             }
             localPlayer.transform.position = msg.devicePosition2;
             localPlayer.transform.rotation = msg.deviceRotation2;
             //localPlayer.transform.SetParent(WorldMap.transform, true);
-            clientsRawData[1] = localPlayer;
+            ClientRawGameObjects[1] = localPlayer;
         }
         if (msg.devicePosition3 != Vector3.zero && msg.deviceRotation3 != Quaternion.identity)
         {
             print("Second player is added");
             GameObject localPlayer;
-            if (clientsRawData[2] == null)
+            if (ClientRawGameObjects[2] == null)
             {
                 localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
-                clientsRawData[2] = localPlayer;
+                ClientRawGameObjects[2] = localPlayer;
             }
             else
             {
-                localPlayer = clientsRawData[2];
+                localPlayer = ClientRawGameObjects[2];
             }
             localPlayer.transform.position = msg.devicePosition3;
             localPlayer.transform.rotation = msg.deviceRotation3;
             //localPlayer.transform.SetParent(WorldMap.transform, true);
-            clientsRawData[2] = localPlayer;
+            ClientRawGameObjects[2] = localPlayer;
         }
         if (msg.devicePosition4 != Vector3.zero && msg.deviceRotation4 != Quaternion.identity)
         {
-            GameObject localPlayer = clientsRawData[3];
+            GameObject localPlayer = ClientRawGameObjects[3];
             localPlayer.transform.position = msg.devicePosition4;
             localPlayer.transform.rotation = msg.deviceRotation4;
-            clientsRawData[3] = localPlayer;
+            ClientRawGameObjects[3] = localPlayer;
         }
         if (msg.devicePosition5 != Vector3.zero && msg.deviceRotation5 != Quaternion.identity)
         {
-            GameObject localPlayer = clientsRawData[4];
+            GameObject localPlayer = ClientRawGameObjects[4];
             localPlayer.transform.position = msg.devicePosition5;
             localPlayer.transform.rotation = msg.deviceRotation5;
-            clientsRawData[4] = localPlayer;
+            ClientRawGameObjects[4] = localPlayer;
         }
         if (msg.devicePosition6 != Vector3.zero && msg.deviceRotation6 != Quaternion.identity)
         {
-            GameObject localPlayer = clientsRawData[5];
+            GameObject localPlayer = ClientRawGameObjects[5];
             localPlayer.transform.position = msg.devicePosition6;
             localPlayer.transform.rotation = msg.deviceRotation6;
-            clientsRawData[5] = localPlayer;
+            ClientRawGameObjects[5] = localPlayer;
         }
         if (msg.devicePosition7 != Vector3.zero && msg.deviceRotation7 != Quaternion.identity)
         {
-            GameObject localPlayer = clientsRawData[6];
+            GameObject localPlayer = ClientRawGameObjects[6];
             localPlayer.transform.position = msg.devicePosition7;
             localPlayer.transform.rotation = msg.deviceRotation7;
-            clientsRawData[6] = localPlayer;
+            ClientRawGameObjects[6] = localPlayer;
         }
         if (msg.devicePosition8 != Vector3.zero && msg.deviceRotation8 != Quaternion.identity)
         {
-            GameObject localPlayer = clientsRawData[7];
+            GameObject localPlayer = ClientRawGameObjects[7];
             localPlayer.transform.position = msg.devicePosition8;
             localPlayer.transform.rotation = msg.deviceRotation8;
-            clientsRawData[7] = localPlayer;
+            ClientRawGameObjects[7] = localPlayer;
         }
 
         //clientsRawData = msg.clients;
@@ -319,15 +266,17 @@ public class CustomNetworkManager : NetworkManager {
             if (playerPosition != Vector3.zero && playerRotation != Quaternion.identity)
             {
                 GameObject localPlayer;
-                if (clientsRawData[i] == null)
+                if (ClientRawGameObjects[i] == null)
                 {
                     localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
-                    clientsRawData[0] = localPlayer;
+                    ClientRawGameObjects[i] = localPlayer;
                 }
                 else
                 {
-                    localPlayer = clientsRawData[0];
+                    localPlayer = ClientRawGameObjects[i];
                 }
+
+
 
                 //Determine the floor
                 FloorLevel floor = DetermineFloor(playerPosition);
@@ -344,11 +293,19 @@ public class CustomNetworkManager : NetworkManager {
                 // assign the localposition as required
                 localPlayer.transform.localPosition = localizedPosition;
                 localPlayer.transform.localRotation = playerRotation;
-                clientsRawData[i] = localPlayer;
+                ClientRawGameObjects[i] = localPlayer;
+
             }
+            else
+            { //TODO: Have to handle else condition
+                ClientRawGameObjects[i] = null;
+            }
+
+
         }
     }
 
+    //TODO: THe function to get floor value is getting redundant in many classes. Try to optimize it.
     private GameObject SelectParent(FloorLevel floor)
     {
         GameObject parent;

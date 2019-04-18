@@ -3,23 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface INodeNavigationInterface{
-
-    void pathCalculationCompleled();
-
-}
 
 public class NodeNavigation : MonoBehaviour {
-
-    public INodeNavigationInterface delegator;
-    NavigationViz navViz = new NavigationViz();
+    
+    [SerializeField] GameObject PlayerMovementGameObject;
+    PlayerMovement playerMovementManager;
     
     public static NodeNavigation instance;
     public TextAsset textFile;
+    public TextAsset Floor1LocationFile, Floor2LocationFile, Floor3LocationFile, Floor4LocationFile;
+    [SerializeField] public GameObject Building, FirstFloor, SecondFloor, ThirdFloor, FourthFloor;
+
+
     // Start is called before the first frame update
     public static string startNode, destination;
     Dictionary<string, ArrayList> graph = new Dictionary<string, ArrayList>();
     public static ArrayList possiblePaths = new ArrayList();
+
     private void Awake(){
         if (instance == null){
             instance = this;
@@ -33,53 +33,129 @@ public class NodeNavigation : MonoBehaviour {
 
     void Start()
     {
+        //Check for player movement manager to get floor level.
+        playerMovementManager = PlayerMovementGameObject.GetComponent<PlayerMovement>();
+
         GenerateGraph();
 
-        delegator = navViz;
-        startNode = "4042";
-        destination = "130";
+        //startNode = "4042";
+        //destination = "130";
 
-        GetAllPaths();
-        if (possiblePaths.Count == 0){
-            print("No paths have been found");
-        }else{
-            print("there are " + possiblePaths.Count + " possible paths ");
-        }
-        navViz.pathCalculationCompleled();
+        //GetAllPaths();
+        //if (possiblePaths.Count == 0)
+        //{
+        //    print("No paths have been found");
+        //}
+        //else
+        //{
+        //    print("there are " + possiblePaths.Count + " possible paths ");
+        //}
     }
 
-    private void GenerateGraph()
-    {
-        string text = textFile.text;  //this is the content as string
-        //print("the text in the file is:\n " + text);
 
+
+    //GenerateGraph method will create a datastructure in form of Key value pairs reading from provided text file. It is an independent function 
+    void GenerateGraph()
+    {
+        string text = textFile.text;
         string[] nodeCollection = text.Split('\n');
 
-        foreach(string nodeList in nodeCollection)
+        foreach (string nodeList in nodeCollection)
         {
             string[] nodes = nodeList.Split(' ');
             var key = nodes[0];
             var childrens = new ArrayList();
-            for (int i = 1; i < nodes.Length; i++){
+            for (int i = 1; i < nodes.Length; i++)
+            {
                 //print("Adding child to node "+ key +" as " + nodes[i]);
                 childrens.Add(nodes[i]);
             }
             graph.Add(key, childrens);
         }
         print("Graph is generated");
+    }
 
-        //delegator.pathCalculationCompleled();
+
+    // SetStartNode method is responsible to take find out which floor the player currently is, and scan through each node in that floor to determine which one is the nearest node for the player.
+    public void SetStartNode(){
+        if (playerMovementManager == null)
+        {
+            print("Please attach Player Movement GameObject to Node Navigation GameObject in IDE");
+            return;
+        }
+        FloorLevel floor = playerMovementManager.GetFloor();
+        TextAsset floorLocation = null;
+        GameObject parentFloor = null;
+        switch(floor){
+            case FloorLevel.first:
+                floorLocation = Floor1LocationFile;
+                parentFloor = FirstFloor;
+                break;
+            case FloorLevel.second:
+                floorLocation = Floor2LocationFile;
+                parentFloor = SecondFloor;
+                break;
+            case FloorLevel.third:
+                floorLocation = Floor3LocationFile;
+                parentFloor = ThirdFloor;
+                break;
+            case FloorLevel.fourth:
+                floorLocation = Floor4LocationFile;
+                parentFloor = FourthFloor;
+                break;
+            case FloorLevel.unknown:
+                print("Floor not yet determined");
+                parentFloor = Building;
+                return;
+        }
+
+        string locationString = floorLocation.text;
+        string[] possibleSources = locationString.Split('\n');
+        float shortestDistance = float.MaxValue;
+        startNode = "";
+
+        //TODO: Redundant code/ similar code as performed in custom network manager where each client is allocated a position inside a floor model 
+        //by determining its parent floor, calculating the offset. Trying to do the same calculation over here. The functionality can be optimised for reusability 
+        Vector3 localizedPosition = playerMovementManager.virtualPlayer.transform.position - parentFloor.transform.position;
+
+        foreach (string node in possibleSources){
+            GameObject possibleSource = GameObject.Find(node);
+            if(possibleSource == null){
+                print("Game object named " + node + " was not found..");
+            }
+            float distance = (localizedPosition - possibleSource.transform.position).magnitude;
+            if (distance < shortestDistance){ 
+                shortestDistance = distance;
+                startNode = node;
+            }
+        }
 
     }
 
-    private void GetAllPaths(){
+
+    //GetAllPaths uses the dictionary created by Generategraph to find all possible paths from starNode to destination. Make sure startnode and destination are available before calling this method.
+    public void GetAllPaths(){
+
+        SetStartNode();
+
+        if (startNode == "")
+        {
+            print("Start failed to set...");
+            return;
+        }
+
+        if (destination == "")
+        {
+            print("Destination not available");
+            return;
+        }
 
         var paths = new ArrayList();
         paths.Add(startNode);
 
         Queue queue = new Queue();
         queue.Enqueue(paths);
-
+        possiblePaths.Clear();
 
         while (queue.Count > 0){
             var temporaryPath = queue.Dequeue() as ArrayList;
@@ -116,6 +192,9 @@ public class NodeNavigation : MonoBehaviour {
                 }
             }
         }
+
+        NavigationViz navViz = new NavigationViz();
+        navViz.pathCalculationCompleled();
 
 
 
