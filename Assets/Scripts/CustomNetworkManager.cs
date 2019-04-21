@@ -18,6 +18,7 @@ public class CustomNetworkManager : NetworkManager {
     string hostName;
     string localIP;
     static public GameObject[] ClientRawGameObjects = new GameObject[MaxClients];
+    BuildingFloors defaultBuildingLocation = new BuildingFloors();
 
     public class customMessage : MessageBase
     {
@@ -60,6 +61,15 @@ public class CustomNetworkManager : NetworkManager {
 
     }
 
+    private void Start()
+    {
+
+        defaultBuildingLocation.firstFloorLocation = FirstFloor.transform.position;
+        defaultBuildingLocation.secondFloorLocation = SecondFloor.transform.position;
+        defaultBuildingLocation.thirdFloorLocation = ThirdFloor.transform.position;
+        defaultBuildingLocation.fourthFloorLocation = FourthFloor.transform.position;
+       
+    }
 
     private void Update()
     {
@@ -128,7 +138,7 @@ public class CustomNetworkManager : NetworkManager {
         //TODO: Register event handler to server to client communication
 
         //TODO: Remove 778 handler once 800 is tested well.
-        this.client.RegisterHandler(778, OnReceivedMessage);
+        //this.client.RegisterHandler(778, OnReceivedMessage);
         this.client.RegisterHandler(800, OnReceivedCoordinates);
     }
 
@@ -286,8 +296,10 @@ public class CustomNetworkManager : NetworkManager {
                 parent = SelectParent(floor);
 
                 //Get position based on floor's location in the world
-                Vector3 localizedPosition = playerPosition - parent.transform.position;
-                localPlayer.transform.SetParent(parent.transform, true);
+                Vector3 floorOffset = GetFloorOffsetForFloor(floor);
+
+                Vector3 localizedPosition = playerPosition - floorOffset;
+                localPlayer.transform.SetParent(parent.transform, false);
                 //Set the local players parent as the floor model
                 // Make transformation based on where the floor currently is
                 // assign the localposition as required
@@ -303,6 +315,29 @@ public class CustomNetworkManager : NetworkManager {
 
 
         }
+    }
+
+    private Vector3 GetFloorOffsetForFloor(FloorLevel floorLevel)
+    {
+        Vector3 offset = Vector3.zero;
+        switch (floorLevel){
+            case FloorLevel.first:
+                offset = defaultBuildingLocation.firstFloorLocation;
+                break;
+            case FloorLevel.second:
+                offset = defaultBuildingLocation.secondFloorLocation;
+                break;
+            case FloorLevel.third:
+                offset = defaultBuildingLocation.thirdFloorLocation;
+                break;
+            case FloorLevel.fourth:
+                offset = defaultBuildingLocation.fourthFloorLocation;
+                break;
+            case FloorLevel.unknown:
+                break;
+        }
+
+        return offset;
     }
 
     //TODO: THe function to get floor value is getting redundant in many classes. Try to optimize it.

@@ -16,6 +16,9 @@ TagManager:
   - Places
   - Astronaut
   - Waypoints
+  - CameraLocation1
+  - CameraLocation2
+  - CameraLocation3
   layers:
   - Default
   - TransparentFX

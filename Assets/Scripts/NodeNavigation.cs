@@ -8,12 +8,12 @@ public class NodeNavigation : MonoBehaviour {
     
     [SerializeField] GameObject PlayerMovementGameObject;
     PlayerMovement playerMovementManager;
-    
+
     public static NodeNavigation instance;
     public TextAsset textFile;
     public TextAsset Floor1LocationFile, Floor2LocationFile, Floor3LocationFile, Floor4LocationFile;
     [SerializeField] public GameObject Building, FirstFloor, SecondFloor, ThirdFloor, FourthFloor;
-
+    public NavigationViz navViz;
 
     // Start is called before the first frame update
     public static string startNode, destination;
@@ -35,7 +35,7 @@ public class NodeNavigation : MonoBehaviour {
     {
         //Check for player movement manager to get floor level.
         playerMovementManager = PlayerMovementGameObject.GetComponent<PlayerMovement>();
-
+        navViz = new NavigationViz();
         GenerateGraph();
 
         //startNode = "4042";
@@ -193,11 +193,26 @@ public class NodeNavigation : MonoBehaviour {
             }
         }
 
-        NavigationViz navViz = new NavigationViz();
+
+        drawPath();
+
+
+
+    }
+
+    public void clearPaths(){
+
+        navViz.clearLineRenderer();
+
+    }
+
+    public void reDrawPath(){
+        clearPaths();
+        drawPath();
+    }
+
+    public void drawPath(){
         navViz.pathCalculationCompleled();
-
-
-
     }
 
     private bool existsInPath(string child, ArrayList temporaryPath)
