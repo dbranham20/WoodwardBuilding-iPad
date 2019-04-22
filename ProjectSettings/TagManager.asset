@@ -5,6 +5,20 @@ TagManager:
   serializedVersion: 2
   tags:
   - ARCamera
+  - SimulateButton
+  - SimulationStatus
+  - TopDownCamera
+  - XLocation
+  - YLocation
+  - ZLocation
+  - Room1
+  - ImageTargetArbitrary
+  - Places
+  - Astronaut
+  - Waypoints
+  - CameraLocation1
+  - CameraLocation2
+  - CameraLocation3
   layers:
   - Default
   - TransparentFX

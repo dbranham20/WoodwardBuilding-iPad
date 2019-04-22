@@ -8,19 +8,15 @@ Confidential and Proprietary - Protected under copyright and other laws.
 
 using UnityEngine;
 using Vuforia;
-using UnityEngine.UI;
 
 /// <summary>
-///     A custom handler that implements the ITrackableEventHandler interface.
+/// A custom handler that implements the ITrackableEventHandler interface.
+/// 
+/// Changes made to this file could be overwritten when upgrading the Vuforia version. 
+/// When implementing custom event handler behavior, consider inheriting from this class instead.
 /// </summary>
 public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandler
 {
-    #region PUBLIC_MEMBER_VARIABLES
-    public Text trackingText;
-
-
-    #endregion //PUBLIC_MEMBER_VARIABLES
-
     #region PROTECTED_MEMBER_VARIABLES
 
     protected TrackableBehaviour mTrackableBehaviour;
@@ -58,11 +54,16 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             newStatus == TrackableBehaviour.Status.TRACKED ||
             newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
         {
+            PlayerMovement.PlayerImageTarget = gameObject;
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
+            TrackerManager.Instance.GetTracker<ObjectTracker>().Stop();
             OnTrackingFound();
+            //NewMovementManager.lastImageTracked = mTrackableBehaviour.TrackableName;
+            PlayerMovement.vuforiaTargetDetected = true;
+            PlaySound();
         }
         else if (previousStatus == TrackableBehaviour.Status.TRACKED &&
-                 newStatus == TrackableBehaviour.Status.NOT_FOUND)
+                 newStatus == TrackableBehaviour.Status.NO_POSE)
         {
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
             OnTrackingLost();
@@ -76,12 +77,21 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         }
     }
 
+    private void PlaySound()
+    {
+        AudioSource targetFoundSound = gameObject.GetComponent<AudioSource>();
+        targetFoundSound.Play();
+    }
+
     #endregion // PUBLIC_METHODS
 
     #region PROTECTED_METHODS
 
     protected virtual void OnTrackingFound()
     {
+        print("Trackable tag is " + mTrackableBehaviour.tag + "\n and Xtransform is " + mTrackableBehaviour.transform.position.x + "\nYtransform is " + mTrackableBehaviour.transform.position.y + "\nZtransform is " + mTrackableBehaviour.transform.position.z);
+        CustomNetworkManager.imageTartgetDetected = "mTrackableBehaviour.TrackableName";
+
         var rendererComponents = GetComponentsInChildren<Renderer>(true);
         var colliderComponents = GetComponentsInChildren<Collider>(true);
         var canvasComponents = GetComponentsInChildren<Canvas>(true);
@@ -97,9 +107,6 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         // Enable canvas':
         foreach (var component in canvasComponents)
             component.enabled = true;
-
-        trackingText.text = "True";
-        trackingText.color = Color.green;
     }
 
 
@@ -124,3 +131,5 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     #endregion // PROTECTED_METHODS
 }
+
+

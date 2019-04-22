@@ -1,0 +1,68 @@
+4042 4041 4turn7
+4041 4042 4turn5
+4turn7 4turn8
+4turn8 4turn6 4turn7
+4turn6 4turn4 stair41 4turn8
+4turn4 stair42 435F
+stair41 elevator4 stair4 4turn6
+stair42 stair4 4turn4 R4F
+stair4 stair41 stair42 stair3
+435F 4turn4 4turn2
+4turn2 4turn1 435F
+4turn1 4turn2 4turn3
+4turn3 4turn5 R4M
+4turn5 4041 4turn3 elevator4
+elevator4 stair41 4turn5
+R4F stair42 R4M
+R4M R4F 4turn3
+3turn1 CL1 3turn3
+CL1 3turn1 CL2
+CL2 CL1 3turn2
+3turn2 CL2 333F
+333F 3turn2 MKSPC
+MKSPC 3turn4 333F
+3turn4 MKSPC stair32 3turn6
+stair32 stair3 3turn4 R3F
+stair3 stair31 stair32 stair4 stair2
+R3F stair32 R3M
+stair31 elevator3 stair3 3turn6
+R3M R3F 3turn3
+3turn3 3turn5 R3M 3turn1
+3turn5 3turn3 elevator3 3turn7
+elevator3 stair31 3turn5
+3turn6 3turn4 stair31 3turn8
+3turn8 3turn6 3turn7
+3turn7 3turn8 3turn5
+2turn1 2turn2 210G
+2turn2 2turn1 MosaicLab1
+2turn3 2turn5 R3M MosaicLab2
+2turn4 stair2 2turn6 LinuxLab R2F
+2turn5 2turn3 elevator3 2turn7
+2turn6 2turn4 stair2 2turn8 elevator2
+2turn8 2turn6 2turn7
+2turn7 2turn8 2turn5
+MosaicLab1 LinuxLab 2turn2
+LinuxLab MosaicLab1 2turn4
+210G 2turn1 MosaicLab2
+MosaicLab2 210G 2turn3
+stair2 stair3 2turn4 2turn6 elevator2 R2F stair1
+R2F stair2 R2M 2turn4
+R2M R2F 2turn3
+elevator2 stair2 2turn5 2turn6
+R1M1 R1F1
+R1F1 R1M1 center0
+center0 R1F1 center1
+center1 center0 130 center2 138
+130 center1 center2
+138 center1 center2
+140 center2 center3
+135 center2 center3
+center2 138 130 center1 140 135 center3
+center3 center2 140 135 center4
+center4 center3 stair1 R1F2 R1M2 elevator1
+R1F2 R1M2 center4
+R1M2 R1F2 center4
+stair1 stair2 center4 1turn1
+elevator1 center4 1turn1
+1turn1 stair1 elevator1 1turn2
+1turn2 1turn1
