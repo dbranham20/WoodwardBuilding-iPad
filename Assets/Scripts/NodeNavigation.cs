@@ -14,7 +14,7 @@ public class NodeNavigation : MonoBehaviour {
     public TextAsset Floor1LocationFile, Floor2LocationFile, Floor3LocationFile, Floor4LocationFile;
     [SerializeField] public GameObject Building, FirstFloor, SecondFloor, ThirdFloor, FourthFloor;
     public NavigationViz navViz;
-
+    bool PlayerToPlayerNavigation = false;
     // Start is called before the first frame update
     public static string startNode, destination;
     Dictionary<string, ArrayList> graph = new Dictionary<string, ArrayList>();
@@ -52,7 +52,35 @@ public class NodeNavigation : MonoBehaviour {
         //}
     }
 
+    private void Update()
+    {
+        //Check if Player to Player Navigation is on. If so do!
+        PerformPlayerToPlayerNavigation();
+    }
 
+    private void PerformPlayerToPlayerNavigation()
+    {
+        if(PlayerToPlayerNavigation){
+            float updateFrequency = 3f;
+            float nextUpdate = 0.0f;
+            //TODO:- Update frequency is set. Modify this function properly
+            if (Time.time >= nextUpdate)
+            {
+                GameObject player1 = CustomNetworkManager.ClientRawGameObjects[0];
+                GameObject player2 = CustomNetworkManager.ClientRawGameObjects[1];
+
+                //Cancel the operation if the player2 coordinates are not recived
+                if (player2.transform.position == Vector3.zero || player2 == null)
+                {
+                    print("Player 2 doesn't seem to be a moving real person. Or there are no two players to start this functionality");
+                    return;
+                }
+
+                ShowPathBetween(player1, player2);
+                nextUpdate = Time.time + updateFrequency;
+            }
+        }
+    }
 
     //GenerateGraph method will create a datastructure in form of Key value pairs reading from provided text file. It is an independent function 
     void GenerateGraph()
@@ -83,24 +111,110 @@ public class NodeNavigation : MonoBehaviour {
             print("Please attach Player Movement GameObject to Node Navigation GameObject in IDE");
             return;
         }
-        FloorLevel floor = playerMovementManager.GetFloor();
-        TextAsset floorLocation = null;
+        //FloorLevel floor = playerMovementManager.GetFloor();
+        //TextAsset floorLocation = null;
+        //GameObject parentFloor = null;
+        //switch(floor){
+        //    case FloorLevel.first:
+        //        floorLocation = Floor1LocationFile;
+        //        parentFloor = FirstFloor;
+        //        break;
+        //    case FloorLevel.second:
+        //        floorLocation = Floor2LocationFile;
+        //        parentFloor = SecondFloor;
+        //        break;
+        //    case FloorLevel.third:
+        //        floorLocation = Floor3LocationFile;
+        //        parentFloor = ThirdFloor;
+        //        break;
+        //    case FloorLevel.fourth:
+        //        floorLocation = Floor4LocationFile;
+        //        parentFloor = FourthFloor;
+        //        break;
+        //    case FloorLevel.unknown:
+        //        print("Floor not yet determined");
+        //        parentFloor = Building;
+        //        return;
+        //}
+
+        //string locationString = floorLocation.text;
+        //string[] possibleSources = locationString.Split('\n');
+        //float shortestDistance = float.MaxValue;
+        //startNode = "";
+
+        ////TODO: Redundant code/ similar code as performed in custom network manager where each client is allocated a position inside a floor model 
+        ////by determining its parent floor, calculating the offset. Trying to do the same calculation over here. The functionality can be optimised for reusability 
+        //Vector3 localizedPosition = playerMovementManager.virtualPlayer.transform.position - parentFloor.transform.position;
+
+        //foreach (string node in possibleSources){
+        //    GameObject possibleSource = GameObject.Find(node);
+        //    if(possibleSource == null){
+        //        print("Game object named " + node + " was not found..");
+        //    }
+        //    float distance = (localizedPosition - possibleSource.transform.position).magnitude;
+        //    if (distance < shortestDistance){ 
+        //        shortestDistance = distance;
+        //        startNode = node;
+        //    }
+        //}
+        startNode = NearestNode(playerMovementManager.virtualPlayer);
+
+    }
+
+    //Function to calculate nearest node of given gameObject in the floor plan. 
+    string NearestNode(GameObject playerGameObject)
+    {
+        FloorLevel floorLevel = PlayerMovement.getFloorLevel(playerGameObject);
+
+
+        TextAsset floorNodes = null;
         GameObject parentFloor = null;
-        switch(floor){
+
+        GetParentFloorandAsset(floorLevel, ref floorNodes, ref parentFloor);
+
+        string locationString = floorNodes.text;
+        string[] possibleSources = locationString.Split('\n');
+        string nearestNode = "";
+        float shortestDistance = float.MaxValue;
+
+        Vector3 localizedPosition = playerGameObject.transform.position - parentFloor.transform.position;
+
+        foreach (string node in possibleSources)
+        {
+            GameObject possibleSource = GameObject.Find(node);
+            if (possibleSource == null)
+            {
+                print("Game object named " + node + " was not found..");
+            }
+            float distance = (localizedPosition - possibleSource.transform.position).magnitude;
+            if (distance < shortestDistance)
+            {
+                shortestDistance = distance;
+                nearestNode = node;
+            }
+        }
+
+        return nearestNode;
+    }
+
+    private void GetParentFloorandAsset(FloorLevel floor, ref TextAsset floorNodes, ref GameObject parentFloor)
+    {
+        switch (floor)
+        {
             case FloorLevel.first:
-                floorLocation = Floor1LocationFile;
+                floorNodes = Floor1LocationFile;
                 parentFloor = FirstFloor;
                 break;
             case FloorLevel.second:
-                floorLocation = Floor2LocationFile;
+                floorNodes = Floor2LocationFile;
                 parentFloor = SecondFloor;
                 break;
             case FloorLevel.third:
-                floorLocation = Floor3LocationFile;
+                floorNodes = Floor3LocationFile;
                 parentFloor = ThirdFloor;
                 break;
             case FloorLevel.fourth:
-                floorLocation = Floor4LocationFile;
+                floorNodes = Floor4LocationFile;
                 parentFloor = FourthFloor;
                 break;
             case FloorLevel.unknown:
@@ -108,30 +222,8 @@ public class NodeNavigation : MonoBehaviour {
                 parentFloor = Building;
                 return;
         }
-
-        string locationString = floorLocation.text;
-        string[] possibleSources = locationString.Split('\n');
-        float shortestDistance = float.MaxValue;
-        startNode = "";
-
-        //TODO: Redundant code/ similar code as performed in custom network manager where each client is allocated a position inside a floor model 
-        //by determining its parent floor, calculating the offset. Trying to do the same calculation over here. The functionality can be optimised for reusability 
-        Vector3 localizedPosition = playerMovementManager.virtualPlayer.transform.position - parentFloor.transform.position;
-
-        foreach (string node in possibleSources){
-            GameObject possibleSource = GameObject.Find(node);
-            if(possibleSource == null){
-                print("Game object named " + node + " was not found..");
-            }
-            float distance = (localizedPosition - possibleSource.transform.position).magnitude;
-            if (distance < shortestDistance){ 
-                shortestDistance = distance;
-                startNode = node;
-            }
-        }
-
+        return;
     }
-
 
     //GetAllPaths uses the dictionary created by Generategraph to find all possible paths from starNode to destination. Make sure startnode and destination are available before calling this method.
     public void GetAllPaths(){
@@ -150,6 +242,53 @@ public class NodeNavigation : MonoBehaviour {
             return;
         }
 
+        GeneratePossiblePaths(startNode, destination);
+        //var paths = new ArrayList();
+        //paths.Add(startNode);
+
+        //Queue queue = new Queue();
+        //queue.Enqueue(paths);
+        //possiblePaths.Clear();
+
+        //while (queue.Count > 0){
+        //    var temporaryPath = queue.Dequeue() as ArrayList;
+        //    var last = temporaryPath[temporaryPath.Count - 1] as string;
+
+        //    //Get list of nodes that this last element of the path can reach to 
+        //    //print("Trying to access children for node " + last + " in the graph");
+        //    var children = graph[last] as ArrayList;
+
+        //    //print("The last element is of current path is " + last);
+        //    if (last == destination){
+        //        print("A path has been found.");
+        //        possiblePaths.Add(temporaryPath);
+        //        string pathPrint = "";
+        //        for (int l = 0; l < temporaryPath.Count; l++){
+        //            //print(temporaryPath[l]);
+        //            pathPrint += " -> ";
+        //            pathPrint += temporaryPath[l];
+        //        }
+        //        print("It goes like : "+pathPrint);
+        //    }
+
+        //    //for each child create new path and new paths to the queue.
+        //    for (int i = 0; i < children.Count; i++){
+        //        string child = children[i] as string;
+        //        if (!existsInPath(child, temporaryPath)){
+        //            ArrayList newPath = new ArrayList();
+        //            foreach (string element in temporaryPath)
+        //            {
+        //                newPath.Add(element);
+        //            }
+        //            newPath.Add(child);
+        //            queue.Enqueue(newPath);
+        //        }
+        //    }
+        //}
+        drawPath();
+    }
+
+    void GeneratePossiblePaths(string startNode, string destination){
         var paths = new ArrayList();
         paths.Add(startNode);
 
@@ -157,7 +296,8 @@ public class NodeNavigation : MonoBehaviour {
         queue.Enqueue(paths);
         possiblePaths.Clear();
 
-        while (queue.Count > 0){
+        while (queue.Count > 0)
+        {
             var temporaryPath = queue.Dequeue() as ArrayList;
             var last = temporaryPath[temporaryPath.Count - 1] as string;
 
@@ -166,22 +306,26 @@ public class NodeNavigation : MonoBehaviour {
             var children = graph[last] as ArrayList;
 
             //print("The last element is of current path is " + last);
-            if (last == destination){
+            if (last == destination)
+            {
                 print("A path has been found.");
                 possiblePaths.Add(temporaryPath);
                 string pathPrint = "";
-                for (int l = 0; l < temporaryPath.Count; l++){
+                for (int l = 0; l < temporaryPath.Count; l++)
+                {
                     //print(temporaryPath[l]);
                     pathPrint += " -> ";
                     pathPrint += temporaryPath[l];
                 }
-                print("It goes like : "+pathPrint);
+                print("It goes like : " + pathPrint);
             }
 
             //for each child create new path and new paths to the queue.
-            for (int i = 0; i < children.Count; i++){
+            for (int i = 0; i < children.Count; i++)
+            {
                 string child = children[i] as string;
-                if (!existsInPath(child, temporaryPath)){
+                if (!existsInPath(child, temporaryPath))
+                {
                     ArrayList newPath = new ArrayList();
                     foreach (string element in temporaryPath)
                     {
@@ -192,18 +336,42 @@ public class NodeNavigation : MonoBehaviour {
                 }
             }
         }
+    }
 
+    public void ShowPathBetweenUser()
+    {
+        //Set start node to gameobject near to client 1
+        PlayerToPlayerNavigation = true;
 
-        drawPath();
-
-
+       
 
     }
 
+    //IEnumerator helps starting a coroutine thus avoiding infinite while loop.
+    private void ShowPathBetween(GameObject player1, GameObject player2)
+    {
+        startNode = SetNearestNodeOf(player1);
+        destination = SetNearestNodeOf(player2);
+        GeneratePossiblePaths(startNode, destination);
+        reDrawPath();
+    }
+
+    public void stopPlayerToPlayerNavigation(){
+        PlayerToPlayerNavigation = false;
+        clearPaths();
+    }
+
+
+
+
+
+private string SetNearestNodeOf(GameObject player)
+    {
+        return NearestNode(player);
+    }
+
     public void clearPaths(){
-
         navViz.clearLineRenderer();
-
     }
 
     public void reDrawPath(){

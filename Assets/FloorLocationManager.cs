@@ -29,10 +29,10 @@ public class FloorLocationManager : MonoBehaviour {
         stairCaseViz.fourthFloorLocation = new Vector3(-54.8f, 36.8f, 0f);
 
         //Set top Viz Location
-        topDistinctViz.firstFloorLocation = new Vector3(216.6f, 0f, -7.85f);
-        topDistinctViz.secondFloorLocation = new Vector3(98f, 0f, -7.85f);
-        topDistinctViz.thirdFloorLocation = new Vector3(-19.6f, 0f, -7.9f);
-        topDistinctViz.fourthFloorLocation = new Vector3(-123.8f, 0f, 8.7f);
+        topDistinctViz.firstFloorLocation = new Vector3(126.3f, 105.94f, 30.7f);
+        topDistinctViz.secondFloorLocation = new Vector3(70.6f, 105.94f, 30.7f);
+        topDistinctViz.thirdFloorLocation = new Vector3(14.3f, 105.94f, 30.7f);
+        topDistinctViz.fourthFloorLocation = new Vector3(-34.8f, 105.94f, 37.7f);
 
     }
     // Use this for initialization

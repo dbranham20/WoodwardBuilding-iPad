@@ -13,6 +13,10 @@ public class NavigationViz {
     
     public void clearLineRenderer(){
         LineRenderer line = lineRenderingNode.GetComponent<LineRenderer>();
+        if (line == null)
+        {
+            line = lineRenderingNode.AddComponent<LineRenderer>();
+        }
         line.positionCount = 0;
     }
 

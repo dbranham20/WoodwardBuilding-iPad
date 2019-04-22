@@ -15,6 +15,7 @@ public class CustomNetworkManager : NetworkManager {
     [SerializeField]public GameObject ARCamera, map, camManager;
     [SerializeField] public GameObject Building, FirstFloor, SecondFloor, ThirdFloor, FourthFloor;
     public GameObject playerObject;
+    [SerializeField] GameObject connectedPlayerPrefab;
     string hostName;
     string localIP;
     static public GameObject[] ClientRawGameObjects = new GameObject[MaxClients];
@@ -278,7 +279,7 @@ public class CustomNetworkManager : NetworkManager {
                 GameObject localPlayer;
                 if (ClientRawGameObjects[i] == null)
                 {
-                    localPlayer = (GameObject)Instantiate(playerObject, new GameObject().transform, true);
+                    localPlayer = (GameObject)Instantiate(connectedPlayerPrefab, new GameObject().transform, true);
                     ClientRawGameObjects[i] = localPlayer;
                 }
                 else
@@ -286,6 +287,7 @@ public class CustomNetworkManager : NetworkManager {
                     localPlayer = ClientRawGameObjects[i];
                 }
 
+                ClientRawGameObjects[i] = localPlayer;
 
 
                 //Determine the floor
@@ -299,13 +301,13 @@ public class CustomNetworkManager : NetworkManager {
                 Vector3 floorOffset = GetFloorOffsetForFloor(floor);
 
                 Vector3 localizedPosition = playerPosition - floorOffset;
-                localPlayer.transform.SetParent(parent.transform, false);
+                localPlayer.transform.SetParent(parent.transform, true);
                 //Set the local players parent as the floor model
                 // Make transformation based on where the floor currently is
                 // assign the localposition as required
                 localPlayer.transform.localPosition = localizedPosition;
                 localPlayer.transform.localRotation = playerRotation;
-                ClientRawGameObjects[i] = localPlayer;
+
 
             }
             else
